@@ -1,3 +1,7 @@
+// Configurações do Bitrix24
+const APP_ID = 'local.68392ee1c4c9d0.87281929';
+const APP_SECRET = 'MuTsb9QVy3xbNm7ANHHTSpnyiLY18LCe9N3eMlbDts1qyP2K';
+
 // Inicializa o app quando o Bitrix24 carregar
 BX24.init(function() {
     console.log('App WhatsApp iniciado!');
