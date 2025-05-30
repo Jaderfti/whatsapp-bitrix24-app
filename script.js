@@ -1,6 +1,28 @@
-// Configurações do Bitrix24
-const APP_ID = 'local.68392ee1c4c9d0.87281929';
-const APP_SECRET = 'MuTsb9QVy3xbNm7ANHHTSpnyiLY18LCe9N3eMlbDts1qyP2K';
+const webhookUrl = 'https://astroimob.bitrix24.com.br/rest/1/r79kbtr1thccso0j/';
+
+function loadLeadData(leadId) {
+    fetch(`${webhookUrl}crm.lead.get?id=${leadId}`)
+        .then(response => response.json())
+        .then(result => {
+            if (result.error) {
+                console.error(result.error);
+                document.getElementById('lead-info').innerHTML = '<p>Erro ao carregar lead</p>';
+            } else {
+                const lead = result.result;
+                const phone = lead.PHONE ? lead.PHONE[0].VALUE : '';
+                const name = lead.NAME || 'Cliente';
+
+                document.getElementById('lead-info').innerHTML = `<p><strong>Nome:</strong> ${name}</p><p><strong>Telefone:</strong> ${phone || 'Não informado'}</p>`;
+
+                if (phone) {
+                    const whatsappLink = `https://wa.me/55${phone.replace(/\D/g, '')}`;
+                    document.getElementById('whatsapp-action').innerHTML = `<a href="${whatsappLink}"  class="whatsapp-btn">Enviar WhatsApp</a>`;
+                } else {
+                    document.getElementById('whatsapp-action').innerHTML = '<p style="color: red;">Lead sem telefone cadastrado</p>';
+                }
+            }
+        });
+}
 
 // Inicializa o app quando o Bitrix24 carregar
 BX24.init(function() {
