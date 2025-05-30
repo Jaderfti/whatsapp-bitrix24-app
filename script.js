@@ -1,5 +1,8 @@
 const webhookUrl = 'https://astroimob.bitrix24.com.br/rest/1/r79kbtr1thccso0j/';
-
+BX24.placement.info(function(placement) {
+    const leadId = placement.options.ID;
+    loadLeadData(leadId);
+});
 function loadLeadData(leadId) {
     fetch(`${webhookUrl}crm.lead.get?id=${leadId}`)
         .then(response => response.json())
