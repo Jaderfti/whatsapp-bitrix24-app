@@ -35,6 +35,25 @@
             Abrir no WhatsApp
         </button>
     </div>
+
+    <script>
+        // Registrar o placement quando o app carregar
+        BX24.ready(function() {
+            BX24.placement.info();
+            
+            // Se não estiver em um placement, tenta registrar
+            if (!BX24.placement.info()) {
+                BX24.callMethod(
+                    'placement.bind',
+                    {
+                        'PLACEMENT': 'CRM_LEAD_DETAIL_TAB',
+                        'HANDLER': 'https://jaderfti.github.io/whatsapp-bitrix24-app/index.html',
+                        'TITLE': 'WhatsApp'
+                    }
+                );
+            }
+        });
+     </script>
     
     <script src="script.js"></script>
 </body>
