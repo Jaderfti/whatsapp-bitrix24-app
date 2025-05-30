@@ -6,37 +6,10 @@
     <title>WhatsApp Lead Sender</title>
     <script src="//api.bitrix24.com/api/v1/"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background: #f5f5f5;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .lead-info {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f0f0f0;
-            border-radius: 5px;
-        }
-        .whatsapp-btn {
-            display: inline-block;
-            background: #25D366;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-        .whatsapp-btn:hover {
-            background: #1DA851;
-        }
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .lead-info { margin-bottom: 20px; padding: 15px; background: #f0f0f0; }
+        .whatsapp-btn { background: #25d366; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -49,65 +22,33 @@
     </div>
 
     <script>
-    BX24.init(function(){
-        console.log('App iniciado!');
-        
-        // Pegar ID do lead atual
-        BX24.placement.info(function(placement){
-            console.log('Placement info:', placement);
-            
-            if(placement && placement.options && placement.options.ID) {
-                loadLeadData(placement.options.ID);
-            } else {
-                // Tentar pegar de outra forma
-                BX24.callMethod('crm.lead.get', {
-                    id: BX24.placement.options().ID || 1
-                }, function(result){
-                    if(result.error()) {
-                        console.error(result.error());
-                    } else {
-                        displayLeadInfo(result.data());
-                    }
-                });
-            }
+    BX24.init(function() {
+        BX24.placement.info(function(placement) {
+            const leadId = placement.options.ID;
+            loadLeadData(leadId);
         });
     });
 
     function loadLeadData(leadId) {
-        BX24.callMethod('crm.lead.get', {
-            id: leadId
-        }, function(result){
-            if(result.error()) {
+        BX24.callMethod('crm.lead.get', { id: leadId }, function(result) {
+            if (result.error()) {
                 console.error(result.error());
                 document.getElementById('lead-info').innerHTML = '<p>Erro ao carregar lead</p>';
             } else {
-                displayLeadInfo(result.data());
+                const lead = result.data();
+                const phone = lead.PHONE ? lead.PHONE[0].VALUE : '';
+                const name = lead.NAME || 'Cliente';
+
+                document.getElementById('lead-info').innerHTML = `<p><strong>Nome:</strong> ${name}</p><p><strong>Telefone:</strong> ${phone || 'Não informado'}</p>`;
+
+                if (phone) {
+                    const whatsappLink = `https://wa.me/55${phone.replace(/\D/g, '')}`;
+                    document.getElementById('whatsapp-action').innerHTML = `<a href="${whatsappLink}"  class="whatsapp-btn">Enviar WhatsApp</a>`;
+                } else {
+                    document.getElementById('whatsapp-action').innerHTML = '<p style="color: red;">Lead sem telefone cadastrado</p>';
+                }
             }
         });
-    }
-
-    function displayLeadInfo(lead) {
-        const phone = lead.PHONE ? lead.PHONE[0].VALUE : '';
-        const name = lead.NAME || lead.TITLE || 'Cliente';
-        
-        document.getElementById('lead-info').innerHTML = `
-            <p><strong>Nome:</strong> ${name}</p>
-            <p><strong>Telefone:</strong> ${phone || 'Não informado'}</p>
-        `;
-        
-        if(phone) {
-            const cleanPhone = phone.replace(/\D/g, '');
-            const whatsappLink = `https://wa.me/55${cleanPhone}`;
-            
-            document.getElementById('whatsapp-action').innerHTML = `
-                <a href="${whatsappLink}"  class="whatsapp-btn">
-                    Enviar WhatsApp
-                </a>
-            `;
-        } else {
-            document.getElementById('whatsapp-action').innerHTML = 
-                '<p style="color: red;">Lead sem telefone cadastrado</p>';
-        }
     }
     </script>
 </body>
